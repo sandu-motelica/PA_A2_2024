@@ -1,0 +1,2 @@
+Homework:
+Am creat o functie homework ce primeste 3 parametri a,b,k si care afiseaza toate numerele k-reductibile din intevalul [a, b] precum si timpul de executie a acestei functii. Numerele k-reductibile le-am aflat parcurgand toate numerele din intervalul specificat si verficand daca suma patratelor cifrelor sale redusa pana la o singura cifra este egala cu k. Timpul de executie este afisat in milisecunde.
