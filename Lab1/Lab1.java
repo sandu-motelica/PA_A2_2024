@@ -49,6 +49,54 @@ public class Lab1 {
         System.out.println("Execution time: " + duration + " milliseconds");
     }
 
+    void bonus(int n){
+        int[][] adjacencyMatrix = new int[n][n];
+
+        for(int i = 0; i < n - 1; i++){
+            adjacencyMatrix[i][i+1] = 1;
+            adjacencyMatrix[i+1][i] = 1;
+            adjacencyMatrix[i][n-1] = 1;
+            adjacencyMatrix[n-1][i] = 1;
+        }
+        adjacencyMatrix[0][n-2] = 1;
+        adjacencyMatrix[n-2][0] = 1;
+
+        System.out.println("Adjacency Matrix:");
+        for(int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.print(adjacencyMatrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // Cautare cicluri
+        System.out.println("Cycles of the constructed graph:");
+        int count = 0;
+        for(int i = 0; i < n - 1; i++){
+            int len = 1;
+            while(len < n - 1){
+                StringBuilder cycle = new StringBuilder();
+                for(int j = i; j < i + len + 1; j++){
+                    cycle.append(j % (n - 1)).append(" ");
+                }
+                cycle.append(n-1).append(" ").append(i);
+                System.out.println(cycle);
+                len++;
+                count++;
+            }
+        }
+        // Ultimul ciclu - Ciclu ce contine toate nodurile mai putin cel central
+        for(int i = 0; i < n - 1; i++){
+            System.out.print(i + " ");
+        }
+        System.out.println(0);
+        count++;
+        // Compararea rezultatelor
+        System.out.println("Number of cycles resulted from the algorithm: " + count);
+        System.out.println("Expected number of cycles: " + (n * n - 3 * n + 3));
+    }
+
+
     public static void main(String[] args) {
         Lab1 lab1 = new Lab1();
         lab1.compulsory();
@@ -70,5 +118,6 @@ public class Lab1 {
             return;
         }
         lab1.homework(a, b, k);
+        lab1.bonus(5);
     }
 }
