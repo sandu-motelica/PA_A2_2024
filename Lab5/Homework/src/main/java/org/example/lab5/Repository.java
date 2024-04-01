@@ -1,4 +1,6 @@
-package lab5;
+package org.example.lab5;
+
+import org.example.lab5.exception.InvalidPath;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,17 +13,17 @@ public class Repository {
         this.directoryPath = masterDirectoryPath;
     }
 
-    public List<String> displayRepositoryContent() throws Exception {
+    public List<String> getRepositoryContent() throws InvalidPath {
         List<String> repositoryContent = new ArrayList<>();
         File masterDirectory = new File(directoryPath);
 
         if (!masterDirectory.exists() || !masterDirectory.isDirectory()) {
-            throw new Exception("Directory doesn't exist or is not a directory");
+            throw new InvalidPath("Directory doesn't exist or is not a directory");
         }
 
         File[] directories = masterDirectory.listFiles(File::isDirectory);
         if (directories == null) {
-            throw new Exception("Error while listing employee directories");
+            throw new InvalidPath("Error while listing employee directories");
         }
 
         for (File directory : directories) {
@@ -30,4 +32,9 @@ public class Repository {
 
         return repositoryContent;
     }
+
+    public String getDirectoryPath() {
+        return directoryPath;
+    }
 }
+
