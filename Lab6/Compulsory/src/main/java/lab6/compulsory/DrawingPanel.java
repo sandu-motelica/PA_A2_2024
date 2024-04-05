@@ -4,6 +4,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class DrawingPanel extends Canvas {
     int rows, cols;
     int canvasWidth = 440, canvasHeight = 440;
@@ -12,6 +16,7 @@ public class DrawingPanel extends Canvas {
     int padX, padY;
     int stoneSize = 20;
 
+    private List<Stick> sticks = new ArrayList<>();;
 
     public DrawingPanel(int sizeX, int sizeY) {
         init(sizeX,sizeY);
@@ -29,8 +34,26 @@ public class DrawingPanel extends Canvas {
         this.boardHeight = (rows - 1) * cellHeight;
         setWidth(canvasWidth);
         setHeight(canvasHeight);
+        generateSticks();
         drawGrid();
     }
+
+    private void generateSticks() {
+        Random random = new Random();
+        for (int i = 0; i < rows-1; i++) {
+            for (int j = 0; j < cols-1; j++) {
+                if (random.nextBoolean()) {
+                    Stick stick = new Stick(new Position(i, j), new Position(i + 1, j));
+                    sticks.add(stick);
+                }
+                if (random.nextBoolean()) {
+                    Stick stick = new Stick(new Position(i, j), new Position(i, j + 1));
+                    sticks.add(stick);
+                }
+            }
+        }
+    }
+
 
     private void drawGrid() {
         GraphicsContext gc = getGraphicsContext2D();
@@ -56,6 +79,24 @@ public class DrawingPanel extends Canvas {
                 gc.strokeOval(x, y, stoneSize, stoneSize);
             }
         }
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(4.0);
+        for (Stick stick : sticks) {
+            Position start = stick.getStart();
+            Position end = stick.getEnd();
+            double startX = padX + start.getCol() * cellWidth;
+            double startY = padY + start.getRow() * cellHeight;
+            double endX = padX + end.getCol() * cellWidth;
+            double endY = padY+end.getRow() * cellHeight;
+            gc.strokeLine(startX, startY, endX, endY);
+        }
+        this.setOnMousePressed(e -> drawStone(e.getX(), e.getY()));
+
+    }
+    private void drawStone(double x, double y) {
+        GraphicsContext gc = getGraphicsContext2D();
+        gc.setFill(Color.BLUE); // Change color as needed
+        gc.fillOval(x - stoneSize / 2, y - stoneSize / 2, stoneSize, stoneSize);
     }
     public void updateBoardSize(int sizeX, int sizeY) {
         init(sizeX, sizeY);
