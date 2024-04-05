@@ -34,6 +34,7 @@ public class MainFrame extends Application {
 
     }
 
+
     public void updateDrawingPanel(int sizeX, int sizeY) {
         canvas.updateBoardSize(sizeX, sizeY);
     }

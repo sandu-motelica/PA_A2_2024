@@ -1,5 +1,4 @@
 package lab6.compulsory;
-
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -15,11 +14,13 @@ public class DrawingPanel extends Canvas {
     int cellWidth, cellHeight;
     int padX, padY;
     int stoneSize = 20;
+    double halfStone = (double) stoneSize / 2;
+    private boolean playerOneTurn = true;
 
-    private List<Stick> sticks = new ArrayList<>();;
+    private List<Stick> sticks = new ArrayList<>();
 
     public DrawingPanel(int sizeX, int sizeY) {
-        init(sizeX,sizeY);
+        init(sizeX, sizeY);
     }
 
     final void init(int sizeX, int sizeY) {
@@ -36,12 +37,35 @@ public class DrawingPanel extends Canvas {
         setHeight(canvasHeight);
         generateSticks();
         drawGrid();
+
+        this.setOnMousePressed(e -> {
+            double x = e.getX();
+            double y = e.getY();
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < cols; col++) {
+                    double nodeX = padX + col * cellWidth - halfStone;
+                    double nodeY = padY + row * cellHeight - halfStone;
+                    if (x > nodeX && x < nodeX + stoneSize && y > nodeY && y < nodeY + stoneSize) {
+                        if(playerOneTurn) {
+                            drawStone(nodeX, nodeY, Color.BLUE);
+                            playerOneTurn = false;
+                        }
+                        else{
+                            drawStone(nodeX, nodeY, Color.RED);
+                            playerOneTurn = true;
+                        }
+
+                        return;
+                    }
+                }
+            }
+        });
     }
 
     private void generateSticks() {
         Random random = new Random();
-        for (int i = 0; i < rows-1; i++) {
-            for (int j = 0; j < cols-1; j++) {
+        for (int i = 0; i < rows - 1; i++) {
+            for (int j = 0; j < cols - 1; j++) {
                 if (random.nextBoolean()) {
                     Stick stick = new Stick(new Position(i, j), new Position(i + 1, j));
                     sticks.add(stick);
@@ -53,7 +77,6 @@ public class DrawingPanel extends Canvas {
             }
         }
     }
-
 
     private void drawGrid() {
         GraphicsContext gc = getGraphicsContext2D();
@@ -74,11 +97,12 @@ public class DrawingPanel extends Canvas {
         gc.setLineWidth(1.0);
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                double x = padX + col * cellWidth - stoneSize / 2;
-                double y = padY + row * cellHeight - stoneSize / 2;
+                double x = padX + col * cellWidth - halfStone;
+                double y = padY + row * cellHeight - halfStone;
                 gc.strokeOval(x, y, stoneSize, stoneSize);
             }
         }
+
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(4.0);
         for (Stick stick : sticks) {
@@ -87,17 +111,17 @@ public class DrawingPanel extends Canvas {
             double startX = padX + start.getCol() * cellWidth;
             double startY = padY + start.getRow() * cellHeight;
             double endX = padX + end.getCol() * cellWidth;
-            double endY = padY+end.getRow() * cellHeight;
+            double endY = padY + end.getRow() * cellHeight;
             gc.strokeLine(startX, startY, endX, endY);
         }
-        this.setOnMousePressed(e -> drawStone(e.getX(), e.getY()));
+    }
 
-    }
-    private void drawStone(double x, double y) {
+    private void drawStone(double x, double y, Color c) {
         GraphicsContext gc = getGraphicsContext2D();
-        gc.setFill(Color.BLUE); // Change color as needed
-        gc.fillOval(x - stoneSize / 2, y - stoneSize / 2, stoneSize, stoneSize);
+        gc.setFill(c);
+        gc.fillOval(x, y, stoneSize, stoneSize);
     }
+
     public void updateBoardSize(int sizeX, int sizeY) {
         init(sizeX, sizeY);
     }
