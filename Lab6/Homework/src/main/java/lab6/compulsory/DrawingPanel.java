@@ -30,22 +30,21 @@ public class DrawingPanel extends Canvas {
     public DrawingPanel(int sizeX, int sizeY) {
         nodesOccupied = new int[sizeX][sizeY];
         previousPosition = new Position(-1, -1);
-        init(sizeX, sizeY);
-    }
-
-    final void init(int sizeX, int sizeY) {
         this.rows = sizeX;
         this.cols = sizeY;
+        generateSticks();
+        init();
+    }
+
+    final void init() {
         this.padX = stoneSize + 10;
         this.padY = stoneSize + 10;
         this.cellWidth = (canvasWidth - 2 * padX) / (cols - 1);
         this.cellHeight = (canvasHeight - 2 * padY) / (rows - 1);
-        System.out.println(cellWidth + " " + cellHeight);
         this.boardWidth = (cols - 1) * cellWidth;
         this.boardHeight = (rows - 1) * cellHeight;
         setWidth(canvasWidth);
         setHeight(canvasHeight);
-        generateSticks();
         drawGrid();
 
         this.setOnMousePressed(e -> {
@@ -56,20 +55,21 @@ public class DrawingPanel extends Canvas {
                     double nodeX = padX + col * cellWidth - halfStone;
                     double nodeY = padY + row * cellHeight - halfStone;
                     if (x > nodeX && x < nodeX + stoneSize && y > nodeY && y < nodeY + stoneSize) {
-                        if(isValidMove(row,col)) {
-                            nodesOccupied[row][col] = 2;
+                        if (isValidMove(row, col)) {
                             previousPosition.setRow(row);
                             previousPosition.setCol(col);
                             if (playerOneTurn) {
+                                nodesOccupied[row][col] = 2;
                                 drawStone(nodeX, nodeY, Color.BLUE);
                                 playerOneTurn = false;
                             } else {
+                                nodesOccupied[row][col] = 3;
                                 drawStone(nodeX, nodeY, Color.RED);
                                 playerOneTurn = true;
                             }
-                            if(gameOver()){
+                            if (gameOver()) {
                                 exportBoardToPNG();
-                                System.out.println("Player " + (playerOneTurn?"RED":"BLUE") + " win");
+                                System.out.println("Player " + (playerOneTurn ? "RED" : "BLUE") + " win");
                             }
                             return;
                         }
@@ -79,7 +79,7 @@ public class DrawingPanel extends Canvas {
         });
     }
 
-    public boolean isValidMove(int x, int y){
+    public boolean isValidMove(int x, int y) {
         if (nodesOccupied[x][y] != 1) {
 //            System.out.println("MISCARE INTERZISA");
             return false;
@@ -87,7 +87,7 @@ public class DrawingPanel extends Canvas {
         return previousPosition.getRow() == -1 || isAdjacent(x, y, previousPosition.getRow(), previousPosition.getCol());
     }
 
-    public boolean gameOver(){
+    public boolean gameOver() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (isValidMove(i, j)) {
@@ -98,46 +98,46 @@ public class DrawingPanel extends Canvas {
         return true;
     }
 
-    public boolean isAdjacent(int x, int y, int prevX, int prevY){
-        if(x != prevX && y != prevY)
+    public boolean isAdjacent(int x, int y, int prevX, int prevY) {
+        if (x != prevX && y != prevY)
             return false;
-        if(x == prevX){
-            if(y > prevY) {
+        if (x == prevX) {
+            if (y > prevY) {
                 int aux = y;
                 y = prevY;
                 prevY = aux;
             }
-            for(int currentY = y; currentY < prevY; currentY++){
-                if(!existXStick(x, currentY, currentY + 1))
+            for (int currentY = y; currentY < prevY; currentY++) {
+                if (!existXStick(x, currentY, currentY + 1))
                     return false;
             }
         }
-        if(y == prevY){
-            if(x > prevX) {
+        if (y == prevY) {
+            if (x > prevX) {
                 int aux = x;
                 x = prevX;
                 prevX = aux;
             }
-            for(int currentX = x; currentX < prevX; currentX++){
-                if(!existYStick(y, currentX, currentX + 1))
+            for (int currentX = x; currentX < prevX; currentX++) {
+                if (!existYStick(y, currentX, currentX + 1))
                     return false;
             }
         }
         return true;
     }
 
-    public boolean existXStick(int x, int y1, int y2){
-        for(Stick s: sticks){
-           if(s.getStart().getRow() == x && s.getStart().getCol() == y1 && s.getEnd().getRow() == x && s.getEnd().getCol() == y2){
-               return true;
-           }
+    public boolean existXStick(int x, int y1, int y2) {
+        for (Stick s : sticks) {
+            if (s.getStart().getRow() == x && s.getStart().getCol() == y1 && s.getEnd().getRow() == x && s.getEnd().getCol() == y2) {
+                return true;
+            }
         }
         return false;
     }
 
-    public boolean existYStick(int y, int x1, int x2){
-        for(Stick s: sticks){
-            if(s.getStart().getRow() == x1 && s.getStart().getCol() == y && s.getEnd().getRow() == x2 && s.getEnd().getCol() == y){
+    public boolean existYStick(int y, int x1, int x2) {
+        for (Stick s : sticks) {
+            if (s.getStart().getRow() == x1 && s.getStart().getCol() == y && s.getEnd().getRow() == x2 && s.getEnd().getCol() == y) {
                 return true;
             }
         }
@@ -171,7 +171,7 @@ public class DrawingPanel extends Canvas {
     private void drawGrid() {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, canvasWidth, canvasHeight);
-
+        gc.setLineWidth(2.0);
         gc.setStroke(Color.DARKGRAY);
         for (int row = 0; row < rows; row++) {
             double y = padY + row * cellHeight;
@@ -217,7 +217,60 @@ public class DrawingPanel extends Canvas {
         nodesOccupied = new int[sizeX][sizeY];
         sticks = new ArrayList<>();
         previousPosition = new Position(-1, -1);
-        init(sizeX, sizeY);
+        this.cols = sizeY;
+        this.rows = sizeX;
+        generateSticks();
+        init();
+    }
+
+    public void save() {
+        GameState g = new GameState(rows, cols, previousPosition, nodesOccupied, playerOneTurn, sticks);
+        try {
+            FileOutputStream file = new FileOutputStream("src/save.ser");
+            ObjectOutputStream out = new ObjectOutputStream(file);
+            out.writeObject(g);
+            out.close();
+            file.close();
+            System.out.println("Game saved");
+        } catch (IOException e) {
+            System.out.println("IOException from save method" + e.getMessage());
+        }
+    }
+
+    public void drawStones() {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if(nodesOccupied[row][col] > 1) {
+                    double nodeX = padX + col * cellWidth - halfStone;
+                    double nodeY = padY + row * cellHeight - halfStone;
+                    if(nodesOccupied[row][col] == 2)
+                        drawStone(nodeX, nodeY, Color.BLUE);
+                    else drawStone(nodeX, nodeY, Color.RED);
+                }
+            }
+        }
+    }
+
+    public void load() {
+        GameState g = new GameState(rows, cols, previousPosition, nodesOccupied, playerOneTurn, sticks);
+        try {
+            FileInputStream file = new FileInputStream("src/save.ser");
+            ObjectInput in = new ObjectInputStream(file);
+            g = (GameState) in.readObject();
+            in.close();
+            file.close();
+            System.out.println("Game loaded");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Exception from load: " + e.getMessage());
+        }
+        this.rows = g.getRows();
+        this.cols = g.getCols();
+        this.previousPosition = g.getPreviousPosition();
+        this.nodesOccupied = g.getNodesOccupied();
+        this.playerOneTurn = g.isPlayerOneTurn();
+        this.sticks = g.getSticks();
+        init();
+        drawStones();
     }
 
     public void exportBoardToPNG() {
@@ -227,7 +280,7 @@ public class DrawingPanel extends Canvas {
 
         snapshot(parameters, writableImage);
 
-        File file = new File( "D:\\joc.png");
+        File file = new File("src/joc.png");
         try {
             ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
             System.out.println("Tabloul de joc a fost exportat ca imagine PNG cu succes.");

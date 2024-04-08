@@ -1,7 +1,9 @@
 
 package lab6.compulsory;
 
-public class Stick {
+import java.io.Serializable;
+
+public class Stick implements Serializable {
     private Position start;
     private Position end;
 

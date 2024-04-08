@@ -1,5 +1,8 @@
 package lab6.compulsory;
-public class Position {
+
+import java.io.Serializable;
+
+public class Position implements Serializable {
     private int row;
     private int col;
 

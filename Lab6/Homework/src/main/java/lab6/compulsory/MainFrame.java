@@ -32,6 +32,15 @@ public class MainFrame extends Application {
 
     }
 
+    public void loadGame() {
+        canvas.load();
+    }
+
+    public void saveGame() {
+        canvas.save();
+    }
+
+
 
     public void updateDrawingPanel(int sizeX, int sizeY) {
         canvas.updateBoardSize(sizeX, sizeY);
