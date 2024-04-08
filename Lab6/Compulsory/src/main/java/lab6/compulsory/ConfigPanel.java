@@ -31,12 +31,9 @@ public class ConfigPanel extends HBox {
             int numRow = spinnerCol.getValue();
             int numCol = spinnerRow.getValue();
             frame.updateDrawingPanel(numRow, numCol);
-            System.out.println("NewTable size: " + spinnerCol.getValue() + " " + spinnerRow.getValue());
+            System.out.println("NewTable: " + spinnerCol.getValue() + " " + spinnerRow.getValue());
         });
-
-
         this.getChildren().addAll(label, spinnerCol,spinnerRow,createButton);
-
 
         this.setSpacing(10);
         this.setAlignment(Pos.CENTER);

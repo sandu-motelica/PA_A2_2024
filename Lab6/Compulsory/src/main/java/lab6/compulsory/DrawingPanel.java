@@ -1,11 +1,10 @@
 package lab6.compulsory;
+
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class DrawingPanel extends Canvas {
     int rows, cols;
@@ -17,9 +16,13 @@ public class DrawingPanel extends Canvas {
     double halfStone = (double) stoneSize / 2;
     private boolean playerOneTurn = true;
 
+    private Position previousPosition;
+    private int[][] nodesOccupied;
     private List<Stick> sticks = new ArrayList<>();
 
     public DrawingPanel(int sizeX, int sizeY) {
+        nodesOccupied = new int[sizeX][sizeY];
+        previousPosition = new Position(-1, -1);
         init(sizeX, sizeY);
     }
 
@@ -46,20 +49,94 @@ public class DrawingPanel extends Canvas {
                     double nodeX = padX + col * cellWidth - halfStone;
                     double nodeY = padY + row * cellHeight - halfStone;
                     if (x > nodeX && x < nodeX + stoneSize && y > nodeY && y < nodeY + stoneSize) {
-                        if(playerOneTurn) {
-                            drawStone(nodeX, nodeY, Color.BLUE);
-                            playerOneTurn = false;
+                        if(isValidMove(row,col)) {
+                            nodesOccupied[row][col] = 2;
+                            previousPosition.setRow(row);
+                            previousPosition.setCol(col);
+                            if (playerOneTurn) {
+                                drawStone(nodeX, nodeY, Color.BLUE);
+                                playerOneTurn = false;
+                            } else {
+                                drawStone(nodeX, nodeY, Color.RED);
+                                playerOneTurn = true;
+                            }
+                            if(gameOver()){
+                                System.out.println("Player " + (playerOneTurn?"RED":"BLUE") + " win");
+                            }
+                            return;
                         }
-                        else{
-                            drawStone(nodeX, nodeY, Color.RED);
-                            playerOneTurn = true;
-                        }
-
-                        return;
                     }
                 }
             }
         });
+    }
+
+    public boolean isValidMove(int x, int y){
+        if (nodesOccupied[x][y] != 1) {
+//            System.out.println("MISCARE INTERZISA");
+            return false;
+        }
+        if (previousPosition.getRow() != -1 && !isAdjacent(x, y, previousPosition.getRow(), previousPosition.getCol())) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean gameOver(){
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (isValidMove(i, j)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean isAdjacent(int x, int y, int prevX, int prevY){
+        if(x != prevX && y != prevY)
+            return false;
+        if(x == prevX){
+            if(y > prevY) {
+                int aux = y;
+                y = prevY;
+                prevY = aux;
+            }
+            for(int currentY = y; currentY < prevY; currentY++){
+                if(!existXStick(x, currentY, currentY + 1))
+                    return false;
+            }
+        }
+        if(y == prevY){
+            if(x > prevX) {
+                int aux = x;
+                x = prevX;
+                prevX = aux;
+            }
+            for(int currentX = x; currentX < prevX; currentX++){
+                if(!existYStick(y, currentX, currentX + 1))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean existXStick(int x, int y1, int y2){
+        for(Stick s: sticks){
+           if(s.getStart().getRow() == x && s.getStart().getCol() == y1 && s.getEnd().getRow() == x && s.getEnd().getCol() == y2){
+               return true;
+           }
+        }
+        return false;
+    }
+
+    public boolean existYStick(int y, int x1, int x2){
+        for(Stick s: sticks){
+            if(s.getStart().getRow() == x1 && s.getStart().getCol() == y && s.getEnd().getRow() == x2 && s.getEnd().getCol() == y){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void generateSticks() {
@@ -67,12 +144,20 @@ public class DrawingPanel extends Canvas {
         for (int i = 0; i < rows - 1; i++) {
             for (int j = 0; j < cols - 1; j++) {
                 if (random.nextBoolean()) {
-                    Stick stick = new Stick(new Position(i, j), new Position(i + 1, j));
+                    Position pos1 = new Position(i, j);
+                    Position pos2 = new Position(i + 1, j);
+                    Stick stick = new Stick(pos1, pos2);
                     sticks.add(stick);
+                    nodesOccupied[i][j] = 1;
+                    nodesOccupied[i + 1][j] = 1;
                 }
                 if (random.nextBoolean()) {
-                    Stick stick = new Stick(new Position(i, j), new Position(i, j + 1));
+                    Position pos1 = new Position(i, j);
+                    Position pos2 = new Position(i, j + 1);
+                    Stick stick = new Stick(pos1, pos2);
                     sticks.add(stick);
+                    nodesOccupied[i][j] = 1;
+                    nodesOccupied[i][j + 1] = 1;
                 }
             }
         }
@@ -123,6 +208,10 @@ public class DrawingPanel extends Canvas {
     }
 
     public void updateBoardSize(int sizeX, int sizeY) {
+        playerOneTurn = true;
+        nodesOccupied = new int[sizeX][sizeY];
+        sticks = new ArrayList<>();
+        previousPosition = new Position(-1, -1);
         init(sizeX, sizeY);
     }
 }
