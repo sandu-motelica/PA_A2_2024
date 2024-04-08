@@ -40,7 +40,9 @@ public class MainFrame extends Application {
         canvas.save();
     }
 
-
+    public void setStatus(int status){
+        canvas.setStatus(status);
+    }
 
     public void updateDrawingPanel(int sizeX, int sizeY) {
         canvas.updateBoardSize(sizeX, sizeY);

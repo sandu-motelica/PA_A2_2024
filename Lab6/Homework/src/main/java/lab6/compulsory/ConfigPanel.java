@@ -13,7 +13,7 @@ public class ConfigPanel extends HBox {
 
     Spinner<Integer> spinnerCol;
     Spinner<Integer> spinnerRow;
-    Button createButton;
+    Button createButton, VsButton, AIButton;
 
     public ConfigPanel(MainFrame frame) {
         this.frame = frame;
@@ -33,7 +33,15 @@ public class ConfigPanel extends HBox {
             frame.updateDrawingPanel(numRow, numCol);
             System.out.println("NewTable: " + spinnerCol.getValue() + " " + spinnerRow.getValue());
         });
-        this.getChildren().addAll(label, spinnerCol,spinnerRow,createButton);
+        VsButton = new Button("1 VS 1");
+        VsButton.setOnAction(event -> {
+            frame.setStatus(0);
+        });
+        AIButton = new Button("AI");
+        AIButton.setOnAction(event -> {
+            frame.setStatus(1);
+        });
+        this.getChildren().addAll(label, spinnerCol,spinnerRow,createButton,VsButton, AIButton);
 
         this.setSpacing(10);
         this.setAlignment(Pos.CENTER);

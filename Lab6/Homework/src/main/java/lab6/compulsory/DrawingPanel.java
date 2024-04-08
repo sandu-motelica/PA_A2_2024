@@ -22,7 +22,7 @@ public class DrawingPanel extends Canvas {
     int stoneSize = 20;
     double halfStone = (double) stoneSize / 2;
     private boolean playerOneTurn = true;
-
+    private int status = 0;
     private Position previousPosition;
     private int[][] nodesOccupied;
     private List<Stick> sticks = new ArrayList<>();
@@ -46,35 +46,44 @@ public class DrawingPanel extends Canvas {
         setWidth(canvasWidth);
         setHeight(canvasHeight);
         drawGrid();
+        clickStones();
 
+    }
+
+    public void clickStones(){
         this.setOnMousePressed(e -> {
-            double x = e.getX();
-            double y = e.getY();
-            for (int row = 0; row < rows; row++) {
-                for (int col = 0; col < cols; col++) {
-                    double nodeX = padX + col * cellWidth - halfStone;
-                    double nodeY = padY + row * cellHeight - halfStone;
-                    if (x > nodeX && x < nodeX + stoneSize && y > nodeY && y < nodeY + stoneSize) {
-                        if (isValidMove(row, col)) {
-                            previousPosition.setRow(row);
-                            previousPosition.setCol(col);
-                            if (playerOneTurn) {
-                                nodesOccupied[row][col] = 2;
-                                drawStone(nodeX, nodeY, Color.BLUE);
-                                playerOneTurn = false;
-                            } else {
-                                nodesOccupied[row][col] = 3;
-                                drawStone(nodeX, nodeY, Color.RED);
-                                playerOneTurn = true;
+            if(status == 0 || status == 1 && playerOneTurn) {
+                double x = e.getX();
+                double y = e.getY();
+                for (int row = 0; row < rows; row++) {
+                    for (int col = 0; col < cols; col++) {
+                        double nodeX = padX + col * cellWidth - halfStone;
+                        double nodeY = padY + row * cellHeight - halfStone;
+                        if (x > nodeX && x < nodeX + stoneSize && y > nodeY && y < nodeY + stoneSize) {
+                            if (isValidMove(row, col)) {
+                                previousPosition.setRow(row);
+                                previousPosition.setCol(col);
+                                if (playerOneTurn) {
+                                    nodesOccupied[row][col] = 2;
+                                    drawStone(nodeX, nodeY, Color.BLUE);
+                                    playerOneTurn = false;
+                                } else {
+                                    nodesOccupied[row][col] = 3;
+                                    drawStone(nodeX, nodeY, Color.RED);
+                                    playerOneTurn = true;
+                                }
+                                if (gameOver()) {
+                                    exportBoardToPNG();
+                                    System.out.println("Player " + (playerOneTurn ? "RED" : "BLUE") + " win");
+                                }
+                                return;
                             }
-                            if (gameOver()) {
-                                exportBoardToPNG();
-                                System.out.println("Player " + (playerOneTurn ? "RED" : "BLUE") + " win");
-                            }
-                            return;
                         }
                     }
                 }
+            }
+            else{
+                AIChoice();
             }
         });
     }
@@ -85,6 +94,25 @@ public class DrawingPanel extends Canvas {
             return false;
         }
         return previousPosition.getRow() == -1 || isAdjacent(x, y, previousPosition.getRow(), previousPosition.getCol());
+    }
+
+    public void AIChoice() {
+        System.out.println(previousPosition.getRow()+ " " + previousPosition.getCol());
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (isValidMove(i, j)) {
+                    double nodeX = padX + j * cellWidth - halfStone;
+                    double nodeY = padY + i * cellHeight - halfStone;
+                    previousPosition.setRow(i);
+                    previousPosition.setCol(j);
+                    System.out.println(previousPosition.getRow()+ " " + previousPosition.getCol());
+                    nodesOccupied[i][j] = 3;
+                    drawStone(nodeX, nodeY, Color.RED);
+                    playerOneTurn = true;
+                    return;
+                }
+            }
+        }
     }
 
     public boolean gameOver() {
@@ -287,5 +315,9 @@ public class DrawingPanel extends Canvas {
         } catch (IOException e) {
             System.out.println("A apărut o eroare la exportarea tabloului de joc ca imagine PNG: " + e.getMessage());
         }
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
