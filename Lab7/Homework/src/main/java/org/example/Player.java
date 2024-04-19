@@ -19,26 +19,37 @@ class Player implements Runnable {
         this.game = game;
     }
 
+
     public void run() {
         while (running) {
             synchronized (game) {
-                if (game.isPlayerTurn(this)) {
-                    List<Tile> extractedTiles = game.extractTiles(2);
-                    if (extractedTiles.isEmpty()) {
-                        System.out.println("Empty bag");
-                        this.game.displayWinner();
-                        System.exit(-1);
+                while (!game.isPlayerTurn(this)) {
+                    try {
+                        game.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    tiles.add(extractedTiles.get(0));
-                    tiles.add(extractedTiles.get(1));
-                    System.out.println(name + " a ridicat: " + extractedTiles);
-                    if(completeSequence()){
-                        System.out.println("Winner was determined before emptying bag");
-                        this.game.displayWinner();
-                        System.exit(-1);
-                    }
-                    game.endTurn();
                 }
+                if (!game.isGameRunning()) {
+                    System.exit(-1);
+                }
+
+                List<Tile> extractedTiles = game.extractTiles(2);
+                if (extractedTiles.isEmpty()) {
+                    System.out.println("Empty bag");
+                    game.displayWinner();
+                    System.exit(-1);
+                }
+                tiles.add(extractedTiles.get(0));
+                tiles.add(extractedTiles.get(1));
+                System.out.println(name + " a ridicat: " + extractedTiles);
+                if (completeSequence()) {
+                    System.out.println("Winner was determined before emptying bag");
+                    game.displayWinner();
+                    System.exit(-1);
+                }
+                game.endTurn();
+                game.notifyAll();
             }
             try {
                 Thread.sleep(100);

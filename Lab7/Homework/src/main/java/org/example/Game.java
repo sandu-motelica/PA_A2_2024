@@ -8,12 +8,19 @@ class Game {
     private final List<Player> players = new ArrayList<>();
     private int currentPlayerIndex = 0;
 
+    private boolean gameRunning = true;
+
+
     public void addPlayer(Player player) {
         players.add(player);
         player.setGame(this);
     }
 
     public void play() {
+        Thread timeKeeperThread = new Thread(new TimeKeeper(1, this));
+        timeKeeperThread.setDaemon(true);
+        timeKeeperThread.start();
+
         for (Player player : players) {
             Thread playerThread = new Thread(player);
             player.setRunning(true);
@@ -33,6 +40,16 @@ class Game {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
     }
 
+    public synchronized boolean isGameRunning() {
+        return gameRunning;
+    }
+
+    public synchronized void stopGame() {
+        gameRunning = false;
+        notifyAll();
+        displayWinner();
+    }
+
     public void displayWinner() {
         int maxScore = -1;
         int winner = 0;
@@ -43,14 +60,14 @@ class Game {
                 maxScore = bestSequence.size();
                 winner = i;
             }
-            System.out.println(p.getName() + " len: " + bestSequence.size());
-            for(Tile t: bestSequence){
+            System.out.println(p.getName());
+            for (Tile t : bestSequence) {
                 System.out.print(t + " ");
             }
             System.out.println();
             i++;
         }
-        System.out.println("Winner is " + players.get(winner).getName());
+        System.out.println("🏆 Winner is " + players.get(winner).getName());
     }
 
     @Override
