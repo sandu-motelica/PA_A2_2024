@@ -8,8 +8,11 @@ public class BookDAO {
         Connection con = Database.getConnection();
         AuthorDAO authorDAO = new AuthorDAO();
         if (con != null) {
-            try (PreparedStatement pstmt = con.prepareStatement(
-                    "insert into books (title, language, publication_date, number_of_pages) values (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try {
+                con.setAutoCommit(false);  // Start transaction
+
+                PreparedStatement pstmt = con.prepareStatement(
+                        "insert into books (title, language, publication_date, number_of_pages) values (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
                 pstmt.setString(1, book.getTitle());
                 pstmt.setString(2, book.getLanguage());
                 pstmt.setDate(3, new java.sql.Date(book.getPublicationDate().getTime()));
@@ -28,11 +31,18 @@ public class BookDAO {
                         linkAuthorToBook(authorId, bookId);
                     }
                 }
+
+                con.commit();  // Commit transaction
+            } catch (SQLException e) {
+                con.rollback();  // Rollback transaction in case of an error
+                throw e;
             }
         } else {
             System.out.println("Connection is null");
         }
     }
+
+
 
     public void linkAuthorToBook(int authorId, int bookId) throws SQLException {
         Connection con = Database.getConnection();

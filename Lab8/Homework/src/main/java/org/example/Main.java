@@ -1,5 +1,6 @@
 package org.example;
 
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,23 +9,12 @@ import java.sql.Statement;
 public class Main {
     public static void main(String[] args) {
         try {
-            var authors = new AuthorDAO();
-//authors.create("William Shakespeare");
-            printAllAuthors();
-            System.out.println(authors.findByName("William Shakespeare"));
-            System.out.println(authors.findById(2));
-
-            //BookDAO bookDAO = new BookDAO();
-            //
-            //Book book = new Book();
-            //book.setTitle("Harry Potter and the Philosopher's Stone");
-            //book.setAuthors(List.of("J.K. Rowling"));
-            //book.setLanguage("English");
-            //book.setPublicationDate(new Date());
-            //book.setNumberOfPages(223);
-            //bookDAO.create(book);
+            String currentPath = Paths.get("").toAbsolutePath().toString();
+            Importer importer = new Importer();
+            importer.importData(currentPath + "/books.csv");
 
             printAllBooks();
+
         } catch (SQLException e) {
             System.err.println(e);
         }
