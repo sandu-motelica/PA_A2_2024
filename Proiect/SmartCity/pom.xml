@@ -53,8 +53,22 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>c3p0</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.9</version>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

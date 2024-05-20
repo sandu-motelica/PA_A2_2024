@@ -1,10 +1,14 @@
 package org.example;
 
 public class Driver {
+    private int id;
     private String name;
+    private int locationId;
 
-    public Driver(String name) {
+    public Driver(int id, String name, int locationId) {
+        this.id = id;
         this.name = name;
+        this.locationId = locationId;
     }
 
     public String getName() {
@@ -28,5 +32,25 @@ public class Driver {
                 break;
             }
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
     }
 }
