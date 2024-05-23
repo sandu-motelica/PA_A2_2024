@@ -52,4 +52,13 @@ public class Book {
         this.publicationDate = publicationDate;
     }
 
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", language='" + language + '\'' +
+                ", publicationDate=" + publicationDate +
+                '}';
+    }
 }
