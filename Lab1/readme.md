@@ -1,5 +1,0 @@
-Homework:
-Am creat o functie homework ce primeste 3 parametri a,b,k si care afiseaza toate numerele k-reductibile din intevalul [a, b] precum si timpul de executie a acestei functii. Numerele k-reductibile le-am aflat parcurgand toate numerele din intervalul specificat si verficand daca suma patratelor cifrelor sale redusa pana la o singura cifra este egala cu k. Timpul de executie este afisat in milisecunde.
-
-Bonus:
-Functia bonus creeaza matricea de adiacenta a unui "wheel graph" de dimensiune n (primita ca parametru) si o afiseaza pe ecran. Dupa care afiseaza pe ecran toate ciclurile din acest graf si compararea numarului acestora cu numarul asteptat dat de formula n^2 - 3n + 3. Ciclurile au fost aflate folosindu ma de proprietatile grafului dat, si anume ca fiecare ciclu contine o combinatie de noduri din ciclu principal (cel ce contine toate nodurile mai putin cel central, care leaga toate nodurile intre ele) si nodul central plus nodul initial de la care s-a pornit. In plus la toate aceste cicluri vine si ciclu principal (singurul care nu contine nodul central).

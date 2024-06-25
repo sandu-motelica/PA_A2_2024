@@ -1,7 +1,0 @@
-Homework:
-
-Pentru clasa Trip existenta am implementat metoda displayVisitableNotPayableLocations() ce afiseaza atractiile ce implementeaza interfata Visitable dar nu si pe cea Payable. In interfata Visitable metoda default getOpeningHour() a fost adaugata pentru a returna ora deschiderii din ziua primita ca argument. Intervalul de timp de activitate pentru Attraction a fost implementat cu ajutorul clasei IntervalTime ce extinde clasa Pair ce simuleaza comportamentul unei "tuple". Am creat clasa TravelPlan ce specifica in ce zi este vizitata fiecare atractie. 
-
-Bonus:
-
-In implementarea construirii unui plan de calatorie am creat doua clase suplimentare Node si Graph. Node simuleaza comportamentul unui nod dintr-un graf ce contine o atractie si o lista de alte noduri vecine. Clasa Graph construieste graful efectiv, adugand nodurile si creand legaturile dintre acestea. Doua noduri sunt conectate daca reprezinta acelasi timp de atractie, pentru aceasta am creat o metoda statica ce compara doua obiecte Attraction. Colorarea grafului format am implementat-o in clasa Trip prin metoda heuristicColoring() creand astfel o lista de obiecte TravelPlan. Metoda implementeaza o colorare statica dupa gradele nodurilor. Respectiv, pentru colorarea, mai intai, am ordonat descrescator nodurile dupa gradul lor, dupa care am parcurs lista de date(LocalDate) din orarul fiecarui Node si daca aceasta se include in intervalul de timp al obiectului Trip si nu exista la vreun vecin, atunci se adauga respectivul TravelPlan la lista. 
