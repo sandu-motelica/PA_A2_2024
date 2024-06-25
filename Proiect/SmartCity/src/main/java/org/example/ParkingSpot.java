@@ -9,6 +9,11 @@ public class ParkingSpot {
         this.occupied = false;
     }
 
+    public ParkingSpot(int spotNumber, boolean occupied) {
+        this.spotNumber = spotNumber;
+        this.occupied = occupied;
+    }
+
     public int getSpotNumber() {
         return spotNumber;
     }

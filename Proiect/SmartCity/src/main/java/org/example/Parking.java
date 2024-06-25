@@ -9,8 +9,8 @@ public class Parking extends Location{
     private List<ParkingSpot> spots;
 
 
-    public Parking(int id, String name, String address, int numberOfSpots, int occSpots, double x, double y) {
-        super(id, name, x, y);
+    public Parking(int locationId, String name, String address, int numberOfSpots, int occSpots, double x, double y) {
+        super(locationId, name, x, y);
         this.address = address;
         this.totalSpots = numberOfSpots;
         this.occupiedSpots = occSpots;
@@ -19,6 +19,15 @@ public class Parking extends Location{
             spots.add(new ParkingSpot(i + 1));
         }
     }
+
+    public Parking( int locationId, String address, int numberOfSpots, int occSpots){
+        super(locationId);
+        this.address = address;
+        this.totalSpots = numberOfSpots;
+        this.occupiedSpots = occSpots;
+    }
+
+
 
     public List<ParkingSpot> getSpots() {
         return spots;

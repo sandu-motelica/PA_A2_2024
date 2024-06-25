@@ -1,8 +1,6 @@
 package org.example.db;
 
-import org.example.Driver;
-import org.example.Location;
-import org.example.Parking;
+import org.example.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -130,5 +128,101 @@ public class DataDAO {
         }
         return parkings;
     }
+
+    public static List<Route> getRoutes() {
+        List<Route> routes = new ArrayList<>();
+        String query = "SELECT location_id1, location_id2 FROM Routes";
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int locationId1 = resultSet.getInt("location_id1");
+                int locationId2 = resultSet.getInt("location_id2");
+                routes.add(new Route(locationId1, locationId2));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return routes;
+    }
+
+    public static Parking getParkingByLocationId(int locationId) {
+        Parking parking = null;
+        String query = "SELECT * FROM Parkings WHERE location_id = ?";
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, locationId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                String address = resultSet.getString("address");
+                int totalSpots = resultSet.getInt("total_spots");
+                int occupiedSpots = resultSet.getInt("occupied_spots");
+                parking = new Parking(locationId, address, totalSpots, occupiedSpots);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return parking;
+    }
+
+    public static int getFreeSpots(int locationId) {
+        int freeSpots = 0;
+        String query = "SELECT get_free_spots(?)";
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, locationId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                freeSpots = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return freeSpots;
+    }
+
+    public static List<ParkingSpot> getParkingSpots(int locationId) {
+        List<ParkingSpot> spots = new ArrayList<>();
+        int id = 0;
+        String query = "SELECT id FROM parkings WHERE location_id = ?";
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, locationId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        query = "SELECT spot_number, is_occupied FROM parkingspots WHERE parking_id = ? ORDER BY id ASC";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setLong(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int spotNumber = rs.getInt("spot_number");
+                    boolean isOccupied = rs.getBoolean("is_occupied");
+                    spots.add(new ParkingSpot(spotNumber, isOccupied));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return spots;
+    }
+
 
 }

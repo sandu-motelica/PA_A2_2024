@@ -7,14 +7,17 @@ import java.util.Set;
 
 public class CityGraph {
     private Map<Location, Set<Location>> adjacencyList;
+    private Map<Integer, Location> locationsById;
 
     public CityGraph() {
         this.adjacencyList = new HashMap<>();
+        this.locationsById = new HashMap<>();
     }
 
     public void addLocation(Location location) {
         if (!adjacencyList.containsKey(location)) {
             adjacencyList.put(location, new HashSet<>());
+            locationsById.put(location.getId(), location);
         }
     }
 
@@ -35,5 +38,9 @@ public class CityGraph {
 
     public Set<Location> getConnectedLocations(Location location) {
         return adjacencyList.get(location);
+    }
+
+    public Location getLocationById(int id) {
+        return locationsById.get(id);
     }
 }

@@ -1,16 +1,20 @@
 package org.example;
 
 public class Location {
-    private int id;
+    private int locationId;
     private String name;
     private double x;
     private double y;
 
     public Location(int id, String name, double x, double y) {
-        this.id = id;
+        this.locationId = id;
         this.name = name;
         this.x = x;
         this.y = y;
+    }
+
+    public Location(int locationId) {
+        this.locationId = locationId;
     }
 
     public String getName() {
@@ -44,11 +48,11 @@ public class Location {
     }
 
     public int getId() {
-        return id;
+        return locationId;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.locationId = id;
     }
 
     @Override

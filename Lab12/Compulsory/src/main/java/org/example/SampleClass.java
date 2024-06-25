@@ -8,17 +8,22 @@ public class SampleClass {
     }
 
     @Test
-    public static void testMethod2() {
+    public void testMethod2() {
         System.out.println("testMethod2 executed.");
     }
 
-    public static void regularMethod() {
-        System.out.println("regularMethod executed.");
+    @Test
+    public void testMethodWithParams(int a, String b) {
+        System.out.println("testMethodWithParams executed with values: " + a + ", " + b);
+    }
+
+    public void method() {
+        System.out.println("method executed.");
     }
 
     @Test
-    public void nonStaticTestMethod() {
-        System.out.println("nonStaticTestMethod executed.");
+    public static void staticTestMethodWithParams(int a, double b) {
+        System.out.println("staticTestMethodWithParams executed with values: " + a + ", " + b);
     }
 }
 

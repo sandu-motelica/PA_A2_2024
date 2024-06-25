@@ -1,17 +1,26 @@
 package org.example;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.canvas.*;
-import javafx.scene.image.*;
-import javafx.scene.layout.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.*;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.example.db.DataDAO;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
+
 import java.util.List;
 
 public class Main extends Application {
@@ -78,8 +87,8 @@ public class Main extends Application {
 
     private void openMainApplication(int driverId) {
         Stage mainStage = new Stage();
-        mainStage.setTitle("City Parking Map");
-
+        mainStage.setTitle("SmartCity");
+        mainStage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toExternalForm()));
         City city = new City("Iași");
         Location driverLocation = DataDAO.getDriverLocation(driverId);
         city.addLocation(driverLocation);
@@ -95,6 +104,17 @@ public class Main extends Application {
         Image parkingIcon = new Image(System.getProperty("user.dir") + "/src/main/resources/images/parkingIcon.png");
         drawMap(canvas.getGraphicsContext2D(), city, mapImage, parkingIcon, driverLocation);
 
+        canvas.setOnMouseClicked(event -> {
+            double x = event.getX();
+            double y = event.getY();
+
+            Location clickedLocation = getClickedLocation(city, x, y);
+            if (clickedLocation != null && DataDAO.isParkingLot(clickedLocation.getId())) {
+                Parking parking = DataDAO.getParkingByLocationId(clickedLocation.getId());
+                showParkingDetails(parking);
+            }
+        });
+
         root.getChildren().add(canvas);
         Scene scene = new Scene(root, 900, 600);
 
@@ -107,6 +127,16 @@ public class Main extends Application {
     private void drawMap(GraphicsContext gc, City city, Image mapImage, Image parkingIcon, Location driverLocation) {
         gc.drawImage(mapImage, 0, 0, 900, 600);
         gc.setFill(Color.BLACK);
+        List<Route> routes = DataDAO.getRoutes();
+        gc.setStroke(Color.LIGHTGRAY);
+        gc.setLineWidth(2);
+        for (Route route : routes) {
+            Location location1 = city.getLocationById(route.getLocationId1());
+            Location location2 = city.getLocationById(route.getLocationId2());
+            if (location1 != null && location2 != null) {
+                gc.strokeLine(location1.getX(), location1.getY(), location2.getX(), location2.getY());
+            }
+        }
 
         for (Location location : city.getLocations()) {
             if (location.equals(driverLocation)) {
@@ -122,6 +152,85 @@ public class Main extends Application {
             }
         }
     }
+
+    private Location getClickedLocation(City city, double x, double y) {
+        for (Location location : city.getLocations()) {
+            double locationX = location.getX();
+            double locationY = location.getY();
+            double radius = 15;
+
+            if (Math.pow(x - locationX, 2) + Math.pow(y - locationY, 2) <= Math.pow(radius, 2)) {
+                return location;
+            }
+        }
+        return null;
+    }
+
+    private void showParkingDetails(Parking parking) {
+        Stage detailsStage = new Stage();
+        detailsStage.setTitle("Parking Details");
+        detailsStage.getIcons().add(new Image(getClass().getResource("/images/icon.png").toExternalForm()));
+
+        VBox vbox = new VBox();
+        vbox.setPadding(new Insets(25));
+        vbox.setSpacing(2);
+        vbox.setStyle("-fx-background-color: #f0f0f0;");
+
+        Label addressLabel = new Label("Address: " + parking.getAddress());
+        addressLabel.setStyle("-fx-font-size: 14pt; -fx-font-weight: 500;");
+
+        Label totalSpotsLabel = new Label("Total Spots: " + parking.getTotalSpots());
+        totalSpotsLabel.setStyle("-fx-font-size: 12pt;");
+
+        int freeSpots = DataDAO.getFreeSpots(parking.getId());
+        Label freeSpotsLabel = new Label("Free Spots: " + freeSpots);
+        freeSpotsLabel.setStyle("-fx-font-size: 12pt; -fx-text-fill: #0ca678;");
+
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(8);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(10, 0, 20, 0));
+        gridPane.setStyle("-fx-background-color: #f0f0f0;");
+
+        List<ParkingSpot> parkingSpots = DataDAO.getParkingSpots(parking.getId());
+
+        for (int i = 0; i < parkingSpots.size(); i++) {
+            ParkingSpot spot = parkingSpots.get(i);
+
+            Rectangle spotRect = new Rectangle(30, 38);
+            spotRect.setFill(spot.isOccupied() ? Color.GRAY : Color.web("#0ca678"));
+            spotRect.setArcWidth(10);
+            spotRect.setArcHeight(10);
+
+            Text spotText = new Text(String.valueOf(spot.getSpotNumber()));
+            spotText.setFill(Color.WHITE);
+
+            StackPane spotPane = new StackPane();
+            spotPane.getChildren().addAll(spotRect, spotText);
+            StackPane.setAlignment(spotText, Pos.CENTER);
+
+            gridPane.add(spotPane, i % 6, i / 6);
+        }
+
+        ScrollPane scrollPane = new ScrollPane(gridPane);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: transparent;");
+
+
+        Button closeButton = new Button("Close");
+        closeButton.setStyle("-fx-background-color: #c92a2a; -fx-text-fill: white; -fx-border-radius: 1;");
+        closeButton.setOnAction(e -> detailsStage.close());
+
+        vbox.getChildren().addAll(addressLabel, totalSpotsLabel, freeSpotsLabel, scrollPane, closeButton);
+
+        Scene scene = new Scene(vbox);
+        detailsStage.setScene(scene);
+        detailsStage.sizeToScene();
+        detailsStage.setResizable(true);
+        detailsStage.showAndWait();
+    }
+
 
     public static void main(String[] args) {
         launch(args);
